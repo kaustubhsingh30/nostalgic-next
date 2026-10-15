@@ -1,281 +1,279 @@
 # 🎬 NostalgicNext — Content-Based Movie Recommendation System
 
-[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests: 32 Passed](https://img.shields.io/badge/tests-32%20passed-brightgreen.svg)](https://github.com/kaustubhsingh30/nostalgic-next)
-[![Framework](https://img.shields.io/badge/framework-FastAPI%20%2B%20scikit--learn-indigo.svg)](https://fastapi.tiangolo.com/)
+[![Tests](https://img.shields.io/badge/tests-32%20passed-brightgreen.svg)](https://github.com/kaustubhsingh30/nostalgic-next)
+[![Framework](https://img.shields.io/badge/Framework-FastAPI%20%2B%20scikit--learn-indigo.svg)](https://fastapi.tiangolo.com/)
 
-**NostalgicNext** is a production-grade, content-based movie recommendation system that processes rich film metadata across 4,803 titles, cleans and deduplicates raw records, computes on-demand cosine similarity across vectorized feature spaces, and deterministically ranks relevant movie recommendations with explainable match attributes.
+## 🌐 Live Demo
 
-Designed with a modular, decoupled pipeline architecture, NostalgicNext isolates data cleaning, feature engineering, candidate filtering, similarity scoring, and ranking into independently testable components.
+**[🚀 Launch NostalgicNext](https://nostalgic-next.onrender.com)** · [GitHub Repository](https://github.com/kaustubhsingh30/nostalgic-next)
+
+Explore content-based movie recommendations, search the movie catalog, and discover why movies are recommended.
+
+> **Note:** The free hosted service may take 50 seconds or more to respond after a period of inactivity.
 
 ---
+
+NostalgicNext is a content-based movie recommendation system that processes movie metadata, extracts meaningful features, calculates cosine similarity, and ranks relevant movies with explanations.
+
+The project uses a modular architecture that separates data cleaning, feature engineering, candidate filtering, similarity scoring, and recommendation ranking into independently testable components.
 
 ## 🌟 Key Features
 
-- **5,000+ Film Metadata Processing:** Operates on the comprehensive TMDB movie catalog (4,803 records after cleaning) with genres, keywords, cast, crew, overview, and taglines.
-- **97.98% Metadata Noise Reduction:** Safely parses deeply nested JSON metadata, collapsing 36 MB of raw boilerplate into 729 KB of clean, semantic tokens.
-- **Defensible Deduplication:** Uses primary movie identifiers and cross-references release dates to eliminate duplicate entries without erroneously dropping distinct films with matching titles (e.g., *Batman* 1989 vs *Batman* 1966).
-- **Entity Space Collapse:** Normalizes director and actor tokens (e.g., `Christopher Nolan` $\rightarrow$ `christophernolan`) to eliminate spurious unigram token collisions.
-- **On-Demand Scoring ($<10\text{ ms}$ Latency):** Memory-efficient sparse linear kernel computations avoid unnecessary $O(N^2)$ all-pairs dense matrices.
-- **Interpretable Explanations:** Explains *why* every film was recommended by detailing shared genres, thematic keywords, directors, and top cast members.
-- **Multi-Seed Taste Profiles:** Supports recommendations based on a single seed title or an aggregated profile of multiple favorites.
-- **Deterministic Ranking & Tie-Breaking:** Guaranteed reproducible outputs using similarity scores, `vote_average`, and alphabetical tie-breaking.
-- **Zero-Dependency Modern Web UI:** Sleek, responsive dark-mode single-page application served directly by FastAPI with live autocomplete, genre filtering, and interactive cards.
-- **Backward-Compatible Hybrid Engine:** Preserves collaborative filtering capabilities for rating matrices when user interaction history is available.
-
----
+- **Movie Metadata Processing:** Processes movie information such as genres, keywords, cast, crew, overviews, and taglines.
+- **Data Cleaning:** Parses nested metadata and prepares meaningful text features for recommendations.
+- **Duplicate Handling:** Uses movie identifiers and release information to help distinguish duplicate records from different films with similar titles.
+- **TF-IDF Feature Engineering:** Converts movie metadata into numerical feature vectors.
+- **Cosine Similarity:** Measures content similarity between movies.
+- **Explainable Recommendations:** Provides information about shared genres, keywords, directors, and cast members where available.
+- **Multiple Favorite Movies:** Supports recommendations based on one movie or multiple favorite movies, where supported by the engine.
+- **Deterministic Ranking:** Uses consistent ranking and tie-breaking rules.
+- **Interactive Web Interface:** Provides a web-based interface for searching movies and exploring recommendations.
+- **REST API:** Exposes recommendation functionality through FastAPI.
+- **Automated Testing:** Includes tests for data cleaning, feature engineering, recommendation logic, evaluation, and API behavior.
 
 ## 🏗️ System Architecture
 
-```
-                                  [Raw TMDB Dataset]
-                             (movies.csv & credits.csv)
-                                         │
-                                         ▼
-                             ┌────────────────────────┐
-                             │   Data Cleaning &      │
-                             │   Deduplication        │  ──► 97.98% Noise Reduction
-                             │  (nostalgic_next/data) │
-                             └───────────┬────────────┘
-                                         │
-                                         ▼
-                             ┌────────────────────────┐
-                             │  Feature Engineering   │
-                             │  & TF-IDF Vectorizer   │  ──► 15,000 Sparse Features
-                             │(nostalgic_next/features│
-                             └───────────┬────────────┘
-                                         │
-                   ┌─────────────────────┴─────────────────────┐
-                   ▼                                           ▼
-       [FastAPI Web / REST API]                     [Python SDK & CLI]
-        (nostalgic_next/api.py)                     (main.py / engine.py)
-                   │                                           │
-                   └─────────────────────┬─────────────────────┘
-                                         │
-                                         ▼
-                             ┌────────────────────────┐
-                             │  CandidateFilter       │  ──► Self-Exclusion & Criteria
-                             │ (filtering.py)         │
-                             └───────────┬────────────┘
-                                         │
-                                         ▼
-                             ┌────────────────────────┐
-                             │  SimilarityScorer      │  ──► On-Demand Cosine Similarity
-                             │  (scoring.py)          │  ──► Explainability Metadata
-                             └───────────┬────────────┘
-                                         │
-                                         ▼
-                             ┌────────────────────────┐
-                             │  RecommendationRanker  │  ──► Top-N Deterministic Sort
-                             │  (ranking.py)          │  ──► Tie-Breaking on Quality
-                             └───────────┬────────────┘
-                                         │
-                                         ▼
-                           [Ranked Recommendations Output]
+```text
+                 Raw Movie Metadata
+                         |
+                         v
+              Data Cleaning and Validation
+                         |
+                         v
+                 Feature Engineering
+                  TF-IDF Vectorization
+                         |
+                         v
+                  Candidate Filtering
+                         |
+                         v
+                 Cosine Similarity
+                         |
+                         v
+                Recommendation Ranking
+                         |
+                         v
+              Explainable Recommendations
+                         |
+             +-----------+-----------+
+             |                       |
+             v                       v
+       FastAPI Web UI            Python CLI
+       and REST API              and SDK
 ```
 
----
+## 📊 Evaluation and Results
 
-## 📊 Verified Evaluation & Experimental Results
+The following results were documented during project development. Re-run the evaluation command below to confirm the results for the current version and dataset.
 
-All metrics below are verified and reproducible across the complete 4,803 movie catalog:
+| Metric | Previously reported value |
+|---|---:|
+| Processed movie catalog | 4,803 records |
+| Metadata noise reduction | 97.98% |
+| Mean Precision@5 | 72.00% |
+| Mean Precision@10 | 65.33% |
+| Mean NDCG@5 | 0.9390 |
+| Mean NDCG@10 | 0.9104 |
+| Mean Reciprocal Rank (MRR@10) | 0.9667 |
+| Intra-List Diversity (ILD) | 0.8751 |
+| Offline sanity checks | 5/5 |
 
-| Metric | Measured Value | Description |
-| :--- | :--- | :--- |
-| **Processed Movie Catalog** | **4,803 records** | TMDB 5000 Movie Dataset |
-| **Metadata Noise Reduction** | **97.98%** | 36,037 KB raw $\rightarrow$ 729 KB clean semantic tokens |
-| **Mean Precision@5** | **72.00%** | Average proportion of top 5 recommendations matching relevance criteria |
-| **Mean Precision@10** | **65.33%** | Average proportion of top 10 recommendations matching relevance criteria |
-| **Mean NDCG@5 (Graded)** | **0.9390** | Normalized Discounted Cumulative Gain with logarithmic position weighting |
-| **Mean NDCG@10 (Graded)** | **0.9104** | Sustained ranking quality across top 10 items |
-| **Mean Reciprocal Rank (MRR@10)** | **0.9667** | Position of first highly relevant recommendation ($1/1 = 1.0$) |
-| **Intra-List Diversity (ILD)** | **0.8751** | Variety score ensuring recommendations are not repetitive copies |
-| **Offline Sanity Checks** | **5 / 5 (100%)** | Verified franchise sequel and director anchors |
+**Important:** Evaluation results depend on the dataset, relevance definitions, and evaluation procedure. They should not be interpreted as universal recommendation accuracy.
 
-> ℹ️ **Notice on Similarity Scores:**
-> Cosine similarity scores quantify alignment in multi-dimensional TF-IDF vector space. A score of `0.35` represents strong content resemblance in genres, keywords, and creative team; it is **not** a calibrated probability or accuracy percentage.
-
----
+Cosine similarity measures content resemblance. A similarity score is not a calibrated probability that a user will like a movie.
 
 ## 📁 Repository Structure
 
-```
+```text
 nostalgic-next/
-├── app.py                         # Production server entry point (FastAPI + Web UI)
-├── main.py                        # Interactive CLI demonstration script
-├── download_data.py               # Automated dataset downloader with mirror fallbacks
-├── requirements.txt               # Pinned Python package dependencies
-├── setup.py                       # Package distribution configuration
-├── pyproject.toml                 # Modern PEP 621 build configuration
-├── Dockerfile                     # Production container deployment config
-├── Procfile                       # PaaS deployment config (Render / Heroku)
-├── render.yaml                    # Render blueprint configuration
-├── INTERVIEW_GUIDE.md             # Complete interview preparation and defense guide
+├── app.py
+├── main.py
+├── download_data.py
+├── requirements.txt
+├── setup.py
+├── pyproject.toml
+├── Dockerfile
+├── Procfile
+├── render.yaml
+├── README.md
+├── INTERVIEW_GUIDE.md
 ├── data/
-│   ├── movies.csv                 # Lightweight sample catalog for offline tests
-│   └── ratings.csv                # Sample user ratings for hybrid tests
-├── nostalgic_next/                # Core production package
-│   ├── __init__.py                # Package exports
-│   ├── data.py                    # Data ingestion, schema validation & cleaning
-│   ├── features.py                # Content soup construction & TF-IDF vectorization
-│   ├── filtering.py               # Candidate resolution, self-exclusion & filters
-│   ├── scoring.py                 # Memory-efficient on-demand cosine scoring
-│   ├── ranking.py                 # Deterministic ranking & tie-breaking
-│   ├── engine.py                  # High-level engine orchestrator & hybrid recommender
-│   ├── evaluation.py              # Reproducible evaluation suite (NDCG, Precision)
-│   └── api.py                     # FastAPI REST API and embedded Web UI
-├── time_capsule_cinema/           # Backward-compatibility alias package
+│   ├── movies.csv
+│   └── ratings.csv
+├── nostalgic_next/
+│   ├── __init__.py
+│   ├── data.py
+│   ├── features.py
+│   ├── filtering.py
+│   ├── scoring.py
+│   ├── ranking.py
+│   ├── engine.py
+│   ├── evaluation.py
+│   └── api.py
+├── time_capsule_cinema/
 │   ├── __init__.py
 │   └── recommender.py
-└── tests/                         # Comprehensive automated test suite (32 tests)
-    ├── test_data_cleaning.py      # Schema validation, missing values & duplicates
-    ├── test_features.py           # Feature engineering & vectorization
-    ├── test_pipeline.py           # Filtering, scoring, ranking & edge cases
-    ├── test_evaluation.py         # Evaluation metrics & NDCG logic
-    ├── test_api.py                # FastAPI endpoints & web routes
-    └── test_recommender.py        # Preserved original test suite
+└── tests/
+    ├── test_data_cleaning.py
+    ├── test_features.py
+    ├── test_pipeline.py
+    ├── test_evaluation.py
+    ├── test_api.py
+    └── test_recommender.py
 ```
 
----
-
-## 🚀 Quickstart & Installation
+## 🚀 Installation and Quickstart
 
 ### 1. Prerequisites
-- Python 3.9, 3.10, 3.11, or 3.12
+
+- Python 3.10–3.12 recommended
 - Git
 
-### 2. Clone Repository
+### 2. Clone the repository
+
 ```bash
 git clone https://github.com/kaustubhsingh30/nostalgic-next.git
 cd nostalgic-next
 ```
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
+### 3. Create a virtual environment (recommended)
+
+**Windows PowerShell:**
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 ```
 
-### 4. Setup Dataset
-Download the TMDB 5000 dataset (auto-downloads from verified public mirrors):
+### 4. Install dependencies
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### 5. Download the dataset
+
 ```bash
 python download_data.py
 ```
-*(Note: If you run `python app.py` or `python main.py`, the dataset is automatically downloaded on first launch if missing).*
 
----
+Dataset downloads require an internet connection and a working source configured by the project.
 
 ## 💻 Running the Application
 
-### Option A: Launch Interactive Web Interface & REST API
+### Option A: Web Interface and REST API
+
 ```bash
 python app.py
 ```
-Open **[http://localhost:8000](http://localhost:8000)** in your browser.
 
-- **Web UI:** Interactive search bar, instant autocomplete, suggested demo anchors, genre filtering, and explanation cards.
-- **Interactive Swagger Docs:** Explore endpoints at **[http://localhost:8000/docs](http://localhost:8000/docs)**.
+Open the local application:
 
-### Option B: Run Command-Line Demonstration
+- Web interface: http://localhost:8000
+- Interactive API documentation: http://localhost:8000/docs
+
+### Option B: Command-Line Demo
+
 ```bash
 python main.py
 ```
 
-### Option C: Python SDK Usage
+### Option C: Python SDK
+
 ```python
-from nostalgic_next import NostalgicNextEngine, RecommendationFilterCriteria
+from nostalgic_next import NostalgicNextEngine
 
-# Load engine with cleaned TMDB dataset
 engine = NostalgicNextEngine.load_from_tmdb()
 
-# Recommend top 5 movies similar to Inception
 recommendations = engine.recommend("Inception", top_n=5)
+
 for movie in recommendations:
-    print(f"{movie.title} ({movie.release_year}) - Score: {movie.similarity_score:.4f}")
+    print(
+        f"{movie.title} ({movie.release_year}) "
+        f"- Score: {movie.similarity_score:.4f}"
+    )
+
     if movie.explanation:
-        print(f"  Why: {movie.explanation.summary_text}")
-
-# Filter recommendations by genre
-sci_fi_recs = engine.recommend(
-    "Avatar",
-    top_n=3,
-    criteria=RecommendationFilterCriteria(genre="Science Fiction")
-)
+        print(f"Why: {movie.explanation.summary_text}")
 ```
 
----
+## 🧪 Testing
 
-## 🧪 Testing & Metric Reproduction
-
-Run the automated test suite covering schema validation, deduplication, feature extraction, filtering, self-exclusion, ranking, and API endpoints:
+Run the automated tests from the project root:
 
 ```bash
-pytest tests -v
+python -m pytest tests -v
 ```
 
-### Reproduce Verified Evaluation Metrics:
+The project test suite previously completed with **32 passing tests**. Run the command above after making changes to confirm the current result.
+
+## 📈 Reproducing Evaluation Metrics
+
+Run the evaluation against the available TMDB dataset:
+
 ```bash
-python -c "
-from nostalgic_next.engine import NostalgicNextEngine
-from nostalgic_next.evaluation import RecommendationEvaluator
-
-engine = NostalgicNextEngine.load_from_tmdb()
-evaluator = RecommendationEvaluator(engine)
-metrics = evaluator.evaluate()
-print(metrics.summary())
-"
+python -c "from nostalgic_next.engine import NostalgicNextEngine; from nostalgic_next.evaluation import RecommendationEvaluator; engine = NostalgicNextEngine.load_from_tmdb(); print(RecommendationEvaluator(engine).evaluate().summary())"
 ```
 
----
+Use the output from this command when reporting measured evaluation results.
 
 ## 🌐 Deployment
 
-### Deploy with Docker
+### Live application
+
+**[https://nostalgic-next.onrender.com](https://nostalgic-next.onrender.com)**
+
+The application is hosted on Render. Free instances may spin down after inactivity, resulting in a delay on the first request.
+
+### Deploy your own instance on Render
+
+1. Sign in to [Render](https://render.com/).
+2. Create a new Web Service and connect this GitHub repository.
+3. Configure the build and start commands according to the repository's deployment configuration.
+4. Confirm that the application listens on the port provided by Render.
+5. Deploy the service and test the public URL.
+
+### Docker
+
+If the repository's Dockerfile is configured correctly for your environment, build and run the container with:
+
 ```bash
 docker build -t nostalgic-next .
-docker run -p 8000:7860 nostalgic-next
+docker run -p 8000:8000 nostalgic-next
 ```
 
-### Deploy to Render
-1. Connect your GitHub repository to [Render](https://render.com).
-2. Create a new **Web Service** using the included `render.yaml` or set:
-   - **Build Command:** `pip install -r requirements.txt && python download_data.py`
-   - **Start Command:** `python app.py`
-   - **Environment Variable:** `PORT=10000`
+Check the Dockerfile for the actual internal port before running the container.
+
+## 🎯 Example Recommendations
+
+For example, a user searching for **The Dark Knight** may receive movies with overlapping genres, themes, cast, or directors.
+
+A user searching for **Inception** may receive other science-fiction, thriller, or Christopher Nolan films, depending on the available metadata and ranking scores.
+
+Actual results depend on the dataset and the running application.
+
+## 🛠️ Technology Stack
+
+- **Language:** Python
+- **API Framework:** FastAPI
+- **Machine Learning:** scikit-learn
+- **Feature Engineering:** TF-IDF vectorization
+- **Similarity Calculation:** Cosine similarity
+- **Testing:** pytest
+- **Deployment:** Docker and Render
+- **Version Control:** Git and GitHub
+
+## 📄 License and Dataset Attribution
+
+- **Source Code:** MIT License. See [LICENSE](LICENSE).
+- **Dataset:** TMDB 5000 Movie Dataset, originally distributed through Kaggle and associated with The Movie Database (TMDb). Review the dataset's original license and attribution requirements before redistributing the data.
 
 ---
 
-## 🎯 Sample Recommendations Walkthrough
+## 🔗 Project Links
 
-### Example 1: *The Dark Knight* (2008)
-```
-Input Movie : The Dark Knight (2008) • Christopher Nolan • Action, Crime, Drama
-Top Recommendations:
-  #1 The Dark Knight Rises (2012) [Score: 0.4539]
-     Match: Directed by Christopher Nolan; Starring Christian Bale; Themes: batman, dc comics
-  #2 Batman Begins (2005) [Score: 0.3728]
-     Match: Directed by Christopher Nolan; Starring Christian Bale; Themes: dc comics, crime fighter
-  #3 Batman Returns (1992) [Score: 0.3089]
-     Match: Shares Action genre; Themes: gotham city, dc comics, crime fighter
-```
-
-### Example 2: *Inception* (2010)
-```
-Input Movie : Inception (2010) • Christopher Nolan • Action, Sci-Fi, Thriller
-Top Recommendations:
-  #1 Insomnia (2002) [Score: 0.1679]
-     Match: Directed by Christopher Nolan; Shares Mystery, Thriller genres
-  #2 The Prestige (2006) [Score: 0.1625]
-     Match: Directed by Christopher Nolan; Shares Mystery, Thriller genres
-  #3 Cypher (2002) [Score: 0.1405]
-     Match: Shares Mystery, Science Fiction, Thriller genres
-  #4 Memento (2000) [Score: 0.1366]
-     Match: Directed by Christopher Nolan; Shares Mystery, Thriller genres
-```
-
----
-
-## ⚖️ License & Dataset Attribution
-
-- **Source Code:** MIT License. See [LICENSE](LICENSE) for details.
-- **Dataset:** TMDB 5000 Movie Dataset, originally assembled by Kaggle and powered by The Movie Database (TMDb) API. Dataset metadata is licensed under CC0 Public Domain.
+- **Live Demo:** https://nostalgic-next.onrender.com
+- **GitHub Repository:** https://github.com/kaustubhsingh30/nostalgic-next
+- **API Documentation:** https://nostalgic-next.onrender.com/docs
