@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: nostalgic-next
+    env: python
+    buildCommand: pip install -r requirements.txt && python download_data.py
+    startCommand: python app.py
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000

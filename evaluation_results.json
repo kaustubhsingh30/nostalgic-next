@@ -1,0 +1,14 @@
+{
+  "evaluated_anchor_movies_count": 15,
+  "mean_precision_at_5": 0.72,
+  "mean_precision_at_10": 0.6533333333333334,
+  "mean_recall_at_10": 1.0733333333333333,
+  "mean_ndcg_at_5": 0.9389743423179147,
+  "mean_ndcg_at_10": 0.9103748485383021,
+  "mean_mrr_at_10": 0.9666666666666667,
+  "mean_intra_list_diversity": 0.8751216702128508,
+  "sanity_checks_passed": 5,
+  "sanity_checks_total": 5,
+  "data_cleaning_noise_reduction_pct": 97.97541636828183,
+  "relevance_proxy_explanation": "Relevance proxy defined by multi-attribute genre and thematic overlap (sharing >= 2 genres or shared director with genre overlap). Graded NDCG evaluates ranking quality with logarithmic position discounting."
+}
